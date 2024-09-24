@@ -2,7 +2,7 @@ const express = require("express") //iniciando o express
 const router = express.Router() //configurando a primeira parte da rota
 /* const { v4: uuidv4 } = require('uuid') //chamado o uuid para criação de id automatico */
 
-const cors = required('cors') // trazendo o pacote cors, que permite consumir a API no front-end
+const cors = require('cors') // trazendo o pacote cors, que permite consumir a API no front-end
 
 const conectaBancoDeDados = require('./bancoDeDados') //Ligando ao arquivo bancoDeDados
 conectaBancoDeDados() // chamando a função que conecta o banco de dados 
