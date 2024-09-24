@@ -1,0 +1,6 @@
+username: iridianacamarante
+Senha: Ro6UZ6FDyE4JctVi
+
+Your current IP address (149.19.165.114)
+
+mongodb+srv://iridianacamarante:Ro6UZ6FDyE4JctVi@clustermulheres.45giv.mongodb.net/?retryWrites=true&w=majority&appName=ClusterMulheres

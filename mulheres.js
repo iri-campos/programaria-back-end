@@ -1,12 +1,23 @@
 const express = require("express") //iniciando o express
 const router = express.Router() //configurando a primeira parte da rota
-const { v4: uuidv4 } = require('uuid') //chamado o uuid para criação de id automatico
+/* const { v4: uuidv4 } = require('uuid') //chamado o uuid para criação de id automatico */
+
+const cors = required('cors') // trazendo o pacote cors, que permite consumir a API no front-end
+
+const conectaBancoDeDados = require('./bancoDeDados') //Ligando ao arquivo bancoDeDados
+conectaBancoDeDados() // chamando a função que conecta o banco de dados 
+
+const Mulher = require('./mulherModel')
 
 const app = express() //iniiciando o app
 app.use(express.json())
+
+app.use(cors())
+
 const porta = 3333 //criando a porta
 
 //lista inicial de mulheres
+/* remover lista inicial de mulheres do código para adicionar pelo banco de dados
 const mulheres = [
     {
         id: '1',
@@ -27,13 +38,29 @@ const mulheres = [
         minibio: 'Fundadora da Programaria'
     }
 ]
+*/
 
 //GET
+/* envia a lista inicial 
 function mostraMulheres(request, response) {
     response.json(mulheres)
 }
+*/
+
+//GET com banco de dados
+async function mostraMulheres(request, response) {
+    try{
+        const mulheresVindasDoBancoDeDados = await Mulher.find()
+
+        response.json(mulheresVindasDoBancoDeDados)
+
+    }catch(erro) {
+        console.log(erro)
+    }
+}
 
 //POST incluindo uma nova mulher a lista
+/* inclui uma nova mulher
 function criaMulher(request, response) {
     const novaMulher = {
         id: uuidv4(),
@@ -46,8 +73,29 @@ function criaMulher(request, response) {
 
     response.json(mulheres)
 }
+    */
+
+
+//POST incluindo uma nova mulher a lista com banco de dados
+async function criaMulher(request, response) {
+    const novaMulher = new Mulher({
+        nome: request.body.nome,
+        imagem: request.body.imagem,
+        minibio: request.body.minibio,
+        citacao: request.body.citacao
+    })
+
+    try {
+        const mulherCriada = await novaMulher.save()
+        response.status(201).json(mulherCriada)
+    } catch (erro) {
+        console.log(erro)
+
+    }
+}
 
 //PATCH alterando um cadastro existente
+/* remove pois será feito pelo banco de dados
 function corrigeMulher(request, response) {
     function encontraMulher(mulher) {
         if(mulher.id === request.params.id) {
@@ -72,8 +120,42 @@ function corrigeMulher(request, response) {
 
     response.json(mulheres)
 }
+    */
+
+//PATCH alterando um cadastro existente com banco de dados
+async function corrigeMulher(request, response) {
+    try {
+        const mulherEncontrada = await Mulher.findById(request.params.id)
+
+        if(request.body.nome) {
+            mulherEncontrada.nome = request.body.nome
+        }
+    
+        if(request.body.minibio) {
+            mulherEncontrada.minibio = request.body.minibio
+        }
+    
+        if(request.body.imagem) {
+            mulherEncontrada.imagem = request.body.imagem
+        }
+
+        if(request.body.citacao) {
+            mulherEncontrada.citacao = request.body.citacao
+        }
+
+        const mulherAtualizadaNoBancoDeDados = await mulherEncontrada.save()
+
+        response.json(mulherAtualizadaNoBancoDeDados)
+
+    }  catch (erro) {
+        console.log(erro)
+    }
+    
+}
+
 
 //DELETE
+/*
 function deletaMulher(request, response) {
     function todasMenosEla(mulher){
         if(mulher.id !== request.params.id) {
@@ -84,6 +166,18 @@ function deletaMulher(request, response) {
     const mulheresQueFicam = mulheres.filter(todasMenosEla)
 
     response.json(mulheresQueFicam)
+}
+*/
+
+//DELETE com banco de dados
+async function deletaMulher(request, response) {
+   try {
+        await Mulher.findByIdAndDelete(request.params.id)
+        response.json({messagem: 'Mulher deletada com sucesso!'})
+    
+   } catch(erro) {
+    console.log(erro)
+   }
 }
 
 //PORTA
